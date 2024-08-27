@@ -1,0 +1,145 @@
+4227160RegalZ
+
+INDIVIDUAL ASSIGNMENT 2
+
+Name: Zuhar Regal
+Student Number: 4227160
+Marks: 76
+Due date: 2nd October 2023
+Lecturer: Dr. Agunbiade Olusanya Yinka 
+Department: Information Systems 
+
+QUESTION 1)
+
+SET SERVEROUTPUT ON
+SET VERIFY OFF
+
+DECLARE
+    -- Declare a record type to store employee details
+    TYPE job_rec IS RECORD (
+       var_empno   o_emp.empno%TYPE,
+       var_ename   o_emp.ename%TYPE,
+       var_job     o_emp.job%TYPE,
+       var_sal     o_emp.sal%TYPE,
+       var_deptno  o_emp.deptno%TYPE
+    );
+    -- Declare a variable of the record type
+    emp_details job_rec;
+BEGIN
+    -- Prompt the user to enter an employee number from the ABC Database
+    emp_details.var_empno := &employee_no;
+
+    -- Fetch employee details from ABC database
+    SELECT empno, ename, job, sal, deptno
+    INTO emp_details.var_empno, emp_details.var_ename, emp_details.var_job, emp_details.var_sal, emp_details.var_deptno
+    FROM o_emp 
+    WHERE empno = emp_details.var_empno;
+
+    -- Display the employee details from the record
+    DBMS_OUTPUT.PUT_LINE('Name: ' || emp_details.var_ename || ' #' || emp_details.var_empno);
+    DBMS_OUTPUT.PUT_LINE('Department no ' || '#' || emp_details.var_deptno);
+    DBMS_OUTPUT.PUT_LINE('Employed as a ' || emp_details.var_job);
+    DBMS_OUTPUT.PUT_LINE('Salary R' || emp_details.var_sal);
+END;
+/
+
+QUESTION 2)
+
+SET SERVEROUTPUT ON
+
+DECLARE
+   -- Declare a cursor named emp_curs
+   CURSOR emp_curs IS
+   SELECT ENAME, EMPNO, JOB, SAL
+   FROM O_EMP
+   WHERE DEPTNO IN (10, 20);
+BEGIN
+   -- Loop through the returned set
+   FOR i IN emp_curs LOOP
+   DBMS_OUTPUT.PUT_LINE(i.ENAME || ' ' || i.EMPNO || ' ' || i.JOB || ' ' || i.SAL);
+   END LOOP;
+END;
+/
+
+QUESTION 3)
+
+SET SERVEROUTPUT ON
+
+DECLARE
+  -- Declare a cursor named staff_cur
+  CURSOR staff_cur IS
+  SELECT ename, empno, job, sal, hiredate
+  FROM o_emp
+  WHERE comm IS NULL;
+
+  var_name o_emp.ename%TYPE;
+  var_empno o_emp.empno%TYPE;
+  var_job o_emp.job%TYPE;
+  var_sal o_emp.sal%TYPE;
+  var_hiredate o_emp.hiredate%TYPE;
+  var_rowcount NUMBER; -- Declare a variable to hold number of rows processed
+BEGIN
+  OPEN staff_cur;
+  LOOP
+  -- Fetch data from the cursor into variables
+  FETCH staff_cur INTO var_name, var_empno, var_job, var_sal, var_hiredate;
+  -- Exit the loop if one of these conditions is met
+  EXIT WHEN var_rowcount > 3 OR staff_cur%NOTFOUND;
+  DBMS_OUTPUT.PUT_LINE(var_name || ' ' || var_empno || ' ' || var_job || ' ' || var_sal || ' ' || TO_CHAR(var_hiredate, 'DD-MON-YY'));
+  END LOOP;
+  CLOSE staff_cur;
+END;
+/ 
+
+QUESTION 4.1)
+
+-- Create the dept_emp_total function
+CREATE OR REPLACE FUNCTION dept_emp_total(par_deptno IN NUMBER) RETURN NUMBER IS
+  var_total NUMBER;
+BEGIN
+  SELECT COUNT(*)
+  INTO var_total
+  FROM o_emp
+  WHERE deptno = par_deptno;
+  RETURN var_total;
+END dept_emp_total;
+/
+-- Using the dept_emp_total function
+SET SERVEROUTPUT ON
+
+DECLARE
+  var_count NUMBER;
+BEGIN
+  var_count := dept_emp_total(20); -- Count employees in department number 20
+  DBMS_OUTPUT.PUT_LINE('Total employees in department: ' || var_count);
+END;
+/
+
+QUESTION 4.2)
+
+SET SERVEROUTPUT ON
+
+DECLARE
+  var_student NUMBER := 15;
+BEGIN
+  UPDATE o_student
+  SET s_address = '48 Saint kilda road'
+  WHERE studentid = var_student;
+  IF SQL%NOTFOUND THEN
+  RAISE NO_DATA_FOUND;
+  END IF;
+  COMMIT; 
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+ DBMS_OUTPUT.PUT_LINE('No such student exists');
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE(SQLERRM);
+END;
+/
+
+
+
+
+
+
+
